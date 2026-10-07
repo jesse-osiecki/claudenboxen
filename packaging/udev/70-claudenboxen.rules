@@ -1,0 +1,3 @@
+# Let the user logged in at the local seat pass USB devices through to a
+# claudenboxen VM session (--isolation vm --usb VID:PID). Hubs excluded.
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{bDeviceClass}!="09", TAG+="uaccess"
