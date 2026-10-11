@@ -10,7 +10,7 @@ depends_x86_64=('qemu-system-x86')
 depends_aarch64=('qemu-system-aarch64')
 makedepends=('go')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('ea546b7ae2c99ff76bc7f8782aa6a2ef09311cf825921e14ee2d8fde74e58a49')
 
 build() {
 	cd "$pkgname-$pkgver"
