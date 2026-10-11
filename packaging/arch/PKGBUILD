@@ -1,5 +1,5 @@
 pkgname=claudenboxen
-pkgver=1.0.0
+pkgver=1.0.1
 pkgrel=1
 pkgdesc="Run Claude Code inside a gVisor sandbox or a QEMU/KVM virtual machine"
 arch=('x86_64' 'aarch64')
@@ -10,7 +10,7 @@ depends_x86_64=('qemu-system-x86')
 depends_aarch64=('qemu-system-aarch64')
 makedepends=('go')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha256sums=('d2fa8f0d67446698291acabc2647b71a9a42e3e84daf82a279d886b9e6e90801')
+sha256sums=('SKIP')
 
 build() {
 	cd "$pkgname-$pkgver"

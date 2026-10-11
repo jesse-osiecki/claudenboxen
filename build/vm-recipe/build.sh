@@ -15,6 +15,10 @@ mkdir -p /opt/claudenboxen
 mv /init.sh /opt/claudenboxen/init
 chmod 755 /opt/claudenboxen/init
 
+# lsusb and udev's own device naming resolve vendor/product names through
+# the compiled hwdb.
+udevadm hwdb --update
+
 # The guest is disposable and single-user: anything passed through is
 # meant for the session user, so raw USB, serial, and HID nodes are opened
 # up beyond the distro defaults (which only cover group-owned classes).

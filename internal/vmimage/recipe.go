@@ -14,7 +14,8 @@ import (
 )
 
 // DefaultRecipe is internal/image.DefaultRecipe plus what the VM needs: the
-// virtio-oriented kernel (which pulls in mkinitfs), udev, sudo, usbutils,
+// virtio-oriented kernel (which pulls in mkinitfs), udev and its hardware
+// database, sudo, usbutils,
 // useradd, util-linux's setsid and setpriv (the BusyBox applets lack the
 // options init.sh needs), iproute2, and e2fsprogs (mke2fs runs inside the
 // build sandbox).
@@ -23,6 +24,7 @@ var DefaultRecipe = func() image.Recipe {
 	r.Packages = append(append([]string{}, image.DefaultRecipe.Packages...),
 		"linux-virt",
 		"eudev",
+		"eudev-hwids",
 		"sudo",
 		"usbutils",
 		"shadow",
