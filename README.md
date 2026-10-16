@@ -37,7 +37,8 @@ go install github.com/jesse-osiecki/claudenboxen@latest
 ```
 
 Or from a checkout: `make` builds `./claudenboxen` with the version from
-`git describe`, `make install` puts it in `$GOPATH/bin`, and `make test`
+`git describe`, `make local` installs it to `/usr/local/bin` ahead of the
+packaged one, `make install` puts it in `$GOPATH/bin`, and `make test`
 runs vet and the tests. See the header of the [`Makefile`](Makefile) for
 the packaging targets.
 

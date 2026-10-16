@@ -3,6 +3,8 @@
 #   make              build ./claudenboxen with the version from git
 #   make test         go vet + go test
 #   make install      go install into $GOPATH/bin
+#   make local        build and install to /usr/local/bin (via sudo), which
+#                     shadows the packaged /usr/bin/claudenboxen
 #   make arch         build the Arch package from packaging/arch/PKGBUILD
 #   make arch-install build and install it with makepkg -si
 #   make arch-bump VERSION=1.2.3
@@ -15,8 +17,9 @@ VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null | sed 's/^v/
 LDFLAGS := -X github.com/jesse-osiecki/claudenboxen/cmd.version=$(VERSION)
 BIN     := claudenboxen
 PKGDIR  := packaging/arch
+PREFIX  ?= /usr/local
 
-.PHONY: all build install test vet fmt generate arch arch-install arch-checksums arch-bump release clean
+.PHONY: all build install local test vet fmt generate arch arch-install arch-checksums arch-bump release clean
 
 all: build
 
@@ -25,6 +28,9 @@ build:
 
 install:
 	CGO_ENABLED=0 go install -trimpath -ldflags "$(LDFLAGS)" .
+
+local: build
+	sudo install -Dm755 $(BIN) $(PREFIX)/bin/$(BIN)
 
 test: vet
 	go test ./...
