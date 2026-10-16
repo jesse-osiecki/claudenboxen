@@ -27,7 +27,7 @@ dependencies for both backends and installs the udev rule USB passthrough
 needs, plus shell completions:
 
 ```sh
-cd packaging/arch && makepkg -si
+make arch-install          # or: cd packaging/arch && makepkg -si
 ```
 
 ### From source
@@ -35,6 +35,11 @@ cd packaging/arch && makepkg -si
 ```sh
 go install github.com/jesse-osiecki/claudenboxen@latest
 ```
+
+Or from a checkout: `make` builds `./claudenboxen` with the version from
+`git describe`, `make install` puts it in `$GOPATH/bin`, and `make test`
+runs vet and the tests. See the header of the [`Makefile`](Makefile) for
+the packaging targets.
 
 Then install the prerequisites below for whichever backend you want.
 
@@ -121,7 +126,7 @@ The Alpine release and rootfs checksums are pinned in
 To move to the current stable release:
 
 ```sh
-go generate ./internal/image/      # rewrites alpine_pin.go from Alpine's release metadata
+make generate                      # rewrites alpine_pin.go from Alpine's release metadata
 go run ./tools/update-alpine -branch v3.23   # or pin a specific branch
 ```
 
