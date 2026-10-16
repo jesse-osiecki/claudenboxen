@@ -226,8 +226,10 @@ func buildMounts(opts Options, rootfs, workDir string) (mounts []specs.Mount, de
 	mounts = append(mounts,
 		specs.Mount{Destination: "/etc/resolv.conf", Type: "bind", Source: oci.ResolvConfSource(), Options: []string{"rbind", "ro"}},
 		specs.Mount{Destination: "/etc/hosts", Type: "bind", Source: "/etc/hosts", Options: []string{"rbind", "ro"}},
-		specs.Mount{Destination: "/etc/ssl/certs", Type: "bind", Source: "/etc/ssl/certs", Options: []string{"rbind", "ro"}},
 	)
+	if ca := oci.CABundleSource(); ca != "" {
+		mounts = append(mounts, specs.Mount{Destination: "/etc/ssl/certs/ca-certificates.crt", Type: "bind", Source: ca, Options: []string{"rbind", "ro"}})
+	}
 
 	return mounts, devices, deviceRules, writeback, nil
 }
