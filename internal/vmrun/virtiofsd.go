@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -38,16 +40,25 @@ func ResolveVirtiofsdBinary(override string) (string, error) {
 //
 // --sandbox none: virtiofsd's own namespace/chroot sandboxing needs
 // privilege this process doesn't have. It still only serves hostDir's
-// subtree, as the same unprivileged user. --inode-file-handles never and
-// --rlimit-nofile 0 skip two startup probes that also need privilege and
-// would otherwise log a warning on every run.
+// subtree, as the same unprivileged user. --inode-file-handles never
+// skips a startup probe that also needs privilege and would otherwise log
+// a warning on every run.
+//
+// --rlimit-nofile: virtiofsd holds a host fd for every file the guest has
+// open, and it budgets the guest's share from its own soft limit. Its
+// default asks for a million, which fails without CAP_SYS_RESOURCE when
+// the hard limit is lower (the usual 524288). 0 would leave the soft
+// limit alone, but Go gives child processes the soft limit it started
+// with, typically 1024, which lets the guest open only a few hundred
+// files before virtiofsd reports "No more file descriptors available to
+// the guest". So pass the hard limit, which needs no privilege to reach.
 func startVirtiofsd(bin, hostDir, socketPath string, readOnly, uncached bool) (*exec.Cmd, error) {
 	args := []string{
 		"--shared-dir", hostDir,
 		"--socket-path", socketPath,
 		"--sandbox", "none",
 		"--inode-file-handles=never",
-		"--rlimit-nofile", "0",
+		"--rlimit-nofile", strconv.FormatUint(virtiofsdNofile(), 10),
 		"--log-level", "warn",
 	}
 	if readOnly {
@@ -69,6 +80,17 @@ func startVirtiofsd(bin, hostDir, socketPath string, readOnly, uncached bool) (*
 		return nil, err
 	}
 	return cmd, nil
+}
+
+// virtiofsdNofile is the value for --rlimit-nofile: this process's hard
+// RLIMIT_NOFILE, capped at virtiofsd's own default of one million. 0 (leave
+// the limit unchanged) is the fallback if the limit can't be read.
+func virtiofsdNofile() uint64 {
+	var r syscall.Rlimit
+	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &r); err != nil {
+		return 0
+	}
+	return min(r.Max, 1_000_000)
 }
 
 func waitForSocket(path string, timeout time.Duration) error {
